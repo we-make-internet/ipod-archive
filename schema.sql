@@ -1,3 +1,5 @@
+BEGIN;
+
 CREATE TABLE ipods (
   ipod_id INTEGER PRIMARY KEY,
   name TEXT
@@ -9,3 +11,5 @@ CREATE TABLE songs (
   artist TEXT,
   album TEXT
 );
+
+COMMIT;
