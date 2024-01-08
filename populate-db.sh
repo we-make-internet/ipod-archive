@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-# set -v
 
 DB_NAME='archive.db'
 
@@ -19,11 +18,7 @@ for dir in ./ipods/*/; do
     xargs -0 mediainfo --Inform="General;%Title%~%Album%~%Artist%\n" |
     sql_escape |
     grep -v '^~~$' |
-    while IFS="~" read -r title album artist; do
-      sqlite3 -init /dev/null "$DB_NAME" <<EOF
-      INSERT INTO songs(ipod_id, title, album, artist)
-      VALUES ($ipod_id, '$title', '$album', '$artist');
-EOF
-    done
-
+    awk -F '~' "{printf(\"%s($ipod_id, '%s', '%s', '%s')\n\", NR==1 ? \"\" : \",\", \$1, \$2, \$3)}" |
+    { echo "INSERT INTO songs(ipod_id, title, album, artist) VALUES"; cat; echo ';'; } |
+    sqlite3 -init /dev/null "$DB_NAME"
 done
