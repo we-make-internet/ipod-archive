@@ -17,12 +17,10 @@ for dir in ./ipods/*/; do
   echo "Archiving the tracks on $ipod_name"
   find "$dir" -name '*.mp3' -type f -print0 |
     xargs -0 mediainfo --Inform="General;%Title%~%Album%~%Artist%\n" |
+    sql_escape |
     while IFS= read -r line; do
       IFS="~" read -r title album artist
-      title=$(echo "$title" | sql_escape)
-      album=$(echo "$album" | sql_escape)
-      artist=$(echo "$artist" | sql_escape)
-      sqlite3 -init /dev/null "$DB_NAME" 2>/dev/null <<EOF
+      sqlite3 -init /dev/null "$DB_NAME" <<EOF
       INSERT INTO songs(ipod_id, title, album, artist)
       VALUES ($ipod_id, '$title', '$album', '$artist');
 EOF
