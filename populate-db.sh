@@ -18,8 +18,7 @@ for dir in ./ipods/*/; do
   find "$dir" -name '*.mp3' -type f -print0 |
     xargs -0 mediainfo --Inform="General;%Title%~%Album%~%Artist%\n" |
     sql_escape |
-    while IFS= read -r line; do
-      IFS="~" read -r title album artist
+    while IFS="~" read -r title album artist; do
       sqlite3 -init /dev/null "$DB_NAME" <<EOF
       INSERT INTO songs(ipod_id, title, album, artist)
       VALUES ($ipod_id, '$title', '$album', '$artist');
